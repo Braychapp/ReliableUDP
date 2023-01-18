@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "Net.h"
+#pragma warning(disable : 4996)
 
 //#define SHOW_ACKS
 
@@ -169,6 +170,10 @@ int main(int argc, char* argv[])
 
 	FlowControl flowControl;
 
+	int i = 0;
+	char hello[] = "Hello World";
+	char message[15];
+
 	while (true)
 	{
 		// update flow control
@@ -202,13 +207,18 @@ int main(int argc, char* argv[])
 		// send and receive packets
 
 		sendAccumulator += DeltaTime;
+		
 
 		while (sendAccumulator > 1.0f / sendRate)
 		{
 			unsigned char packet[PacketSize];
 			memset(packet, 0, sizeof(packet));
+			sprintf(message, "%s %d", hello, i);
+			strcpy((char*)packet, message);
 			connection.SendPacket(packet, sizeof(packet));
 			sendAccumulator -= 1.0f / sendRate;
+			printf("Packet Sent: %s\n", message);
+			i++;
 		}
 
 		while (true)
@@ -217,6 +227,7 @@ int main(int argc, char* argv[])
 			int bytes_read = connection.ReceivePacket(packet, sizeof(packet));
 			if (bytes_read == 0)
 				break;
+			printf("Packet Recieved: %s\n", packet);
 		}
 
 		// show packets that were acked this frame
