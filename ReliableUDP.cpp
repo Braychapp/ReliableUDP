@@ -120,7 +120,16 @@ private:
 int main(int argc, char* argv[])
 {
 	// parse command line
+	/*
+	add additional command line argument checking / verification to
+	check for a file name
+	*/
 
+
+	/*
+	create a file pointer from the verification previously mentioned
+	looking for a file with the name entered as a commend line argument
+	*/
 	enum Mode
 	{
 		Client,
@@ -138,6 +147,7 @@ int main(int argc, char* argv[])
 		{
 			mode = Client;
 			address = Address(a, b, c, d, ServerPort);
+
 		}
 	}
 
@@ -214,8 +224,19 @@ int main(int argc, char* argv[])
 			unsigned char packet[PacketSize];
 			memset(packet, 0, sizeof(packet));
 			sprintf(message, "%s %d", hello, i);
+			/*
+			Packet gets assigned "Hello World" on this line but we need to change that to be 
+			assigned to a file pointer that contains the file we want to be sent over as packets
+			*/
 			strcpy((char*)packet, message);
 			connection.SendPacket(packet, sizeof(packet));
+			/*
+			make sure to break the file into pieces before sending and make sure it has a proper header
+			and also ensure that all the individual pieces are given sequence numbers so they can be properly
+			reassembled on the other side
+
+			also making sure metadata gets sent over with the packet properly
+			*/
 			sendAccumulator -= 1.0f / sendRate;
 			printf("Packet Sent: %s\n", message);
 			i++;
@@ -225,9 +246,24 @@ int main(int argc, char* argv[])
 		{
 			unsigned char packet[256];
 			int bytes_read = connection.ReceivePacket(packet, sizeof(packet));
+			/*
+			Make sure the packets sent in all come with a sequence number and arrange them back into their
+			proper orders
+
+			Check that the packets have metadata included with them in the transfer
+
+			Verify the integrity of the file that has been sent over and identify if there are any missing 
+			sequence numbers to try and get those sent over once everything else has been sent so that it could be 
+			properly reassembled
+			*/
 			if (bytes_read == 0)
 				break;
 			printf("Packet Recieved: %s\n", packet);
+
+			/*
+			Once the packets have all been sent and verified we need to make sure they get put back together
+			in the correct order
+			*/
 		}
 
 		// show packets that were acked this frame
