@@ -253,7 +253,7 @@ int main(int argc, char* argv[])
 			Check that the packets have metadata included with them in the transfer
 
 			Verify the integrity of the file that has been sent over and identify if there are any missing 
-			sequence numbers to try and get those sent over once everything else has been sent so that it could be 
+			sequence numbers to try and get those sent over once everything else has been sent so that it could be
 			properly reassembled
 			*/
 			if (bytes_read == 0)
