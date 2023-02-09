@@ -3,14 +3,28 @@
 	From "Networking for Game Programmers" - http://www.gaffer.org/networking-for-game-programmers
 	Author: Glenn Fiedler <gaffer@gaffer.org>
 */
-
+/*
+What we need to do for the assignment
+parse command line for a file name 
+figure out size of file
+calculate number of required packets to send the file
+create packets and assign them a number
+send packets to the server
+loop for each packet
+read the next packet from the file
+send the packet to server
+close file
+*/
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
+#include "VerifyFiles.h"
 #include "Net.h"
 #pragma warning(disable : 4996)
+
+using namespace std;
 
 //#define SHOW_ACKS
 
@@ -136,8 +150,10 @@ int main(int argc, char* argv[])
 		Server
 	};
 
+	ifstream file;
 	Mode mode = Server;
 	Address address;
+	vector <char> fdata;
 
 	if (argc >= 2)
 	{
@@ -147,6 +163,38 @@ int main(int argc, char* argv[])
 		{
 			mode = Client;
 			address = Address(a, b, c, d, ServerPort);
+
+			if (strstr(argv[2], ".txt") != nullptr)
+			{
+				//we know its a text file
+				file.get(argv[2], ios::in);
+				if (!file.is_open())
+				{
+					cerr << "Failed to open a ASCII file";
+				}
+			}
+			else if (strstr(argv[2], ".bin") != nullptr)
+			{
+				//we know its a binary file
+				file.get(argv[2], ios::binary);
+				if (!file.is_open())
+				{
+					cerr << "Failed to open binary file";
+				}
+			}
+			else
+			{
+				//no file found
+				cerr << "No accepted file extension specified";
+
+
+				return 0;
+			}
+			//fill the vector
+
+			fdata.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+			file.close();
+			//here all the file's data is inside fdata
 
 		}
 	}
@@ -218,17 +266,22 @@ int main(int argc, char* argv[])
 
 		sendAccumulator += DeltaTime;
 		
-
+		int offset = 0;
 		while (sendAccumulator > 1.0f / sendRate)
 		{
+			//packetsize is 256
+			int size = sizeof(fdata);
 			unsigned char packet[PacketSize];
-			memset(packet, 0, sizeof(packet));
-			sprintf(message, "%s %d", hello, i);
-			/*
-			Packet gets assigned "Hello World" on this line but we need to change that to be 
-			assigned to a file pointer that contains the file we want to be sent over as packets
-			*/
-			strcpy((char*)packet, message);
+			memcpy(packet, &fdata[offset], size - offset);
+			int crcValue = crc32((const char*)packet, size);
+			memcpy(packet + size, &crcValue, 4);
+			//packet here contains part of the vector and its crc value and how big it is
+
+			/*memset(packet, 0, sizeof(packet));
+			sprintf(message, "%s %d", hello, i);*/
+
+
+			//strcpy((char*)packet, message);
 			connection.SendPacket(packet, sizeof(packet));
 			/*
 			make sure to break the file into pieces before sending and make sure it has a proper header
@@ -238,8 +291,9 @@ int main(int argc, char* argv[])
 			also making sure metadata gets sent over with the packet properly
 			*/
 			sendAccumulator -= 1.0f / sendRate;
+			offset += size;
 			printf("Packet Sent: %s\n", message);
-			i++;
+			
 		}
 
 		while (true)
