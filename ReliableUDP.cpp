@@ -133,17 +133,6 @@ private:
 
 int main(int argc, char* argv[])
 {
-	// parse command line
-	/*
-	add additional command line argument checking / verification to
-	check for a file name
-	*/
-
-
-	/*
-	create a file pointer from the verification previously mentioned
-	looking for a file with the name entered as a commend line argument
-	*/
 	enum Mode
 	{
 		Client,
@@ -201,9 +190,6 @@ int main(int argc, char* argv[])
 
 				return 0;
 			}
-			//fill the vector
-
-			//here all the file's data is inside fdata
 
 		}
 	}
@@ -242,6 +228,7 @@ int main(int argc, char* argv[])
 	char message[15];
 					
 	int offset = 0;
+	int size = sizeof(fdata);
 	while (true)
 	{
 		// update flow control
@@ -280,19 +267,20 @@ int main(int argc, char* argv[])
 			
 			while (sendAccumulator > 1.0f / sendRate)
 			{				
-				int size = sizeof(fdata);
+				
 
-				if (offset >= size)
+				/*if (offset >= size)
 				{
 					break;
-				}
+				}*/
 				//packetsize is 256
 
 
 				unsigned char packet[PacketSize];
 				memcpy(packet, &fdata[offset], size);
-				int crcValue = crc32((const char*)packet, size);
-				memcpy(packet + size, &crcValue, 4);
+				packet[24] = (unsigned char)"\0";
+				//int crcValue = crc32((const char*)packet, size);
+				//memcpy(packet + size, &crcValue, 4);
 				//packet here contains part of the vector and its crc value and how big it is
 
 				/*memset(packet, 0, sizeof(packet));
@@ -335,10 +323,25 @@ int main(int argc, char* argv[])
 					break;
 				printf("Packet Recieved: %s\n", packet);
 
-				ofstream file("recieved_file.bin");
-				file.open("recieved_file.bin", ios::binary);
-				file << packet;
-				file.close();
+				ofstream file("recieved_file.bin", ofstream::binary);
+				if (file.is_open())
+				{
+					//trying to find the first appearance of a \0 in the packet
+					/*unsigned char remove[sizeof(packet)];
+					for (int i = 0; i < sizeof(packet); i++)
+					{
+						remove[i];
+					}
+					int first_null = -1;
+					for (int i = 0; i < sizeof(packet)));*/
+
+					file << packet;
+					file.close();
+				}
+				else
+				{
+					cerr << "error opening binary file";
+				}
 
 				/*
 				Once the packets have all been sent and verified we need to make sure they get put back together
