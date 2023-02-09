@@ -229,6 +229,7 @@ int main(int argc, char* argv[])
 					
 	int offset = 0;
 	int size = sizeof(fdata);
+	
 	while (true)
 	{
 		// update flow control
@@ -267,28 +268,69 @@ int main(int argc, char* argv[])
 			
 			while (sendAccumulator > 1.0f / sendRate)
 			{				
+				size = fdata.size();
 				
 
-				/*if (offset >= size)
+				if (size <= 0)
 				{
+					offset = 0;
 					break;
-				}*/
+
+				}
 				//packetsize is 256
 
 
 				unsigned char packet[PacketSize];
-				memcpy(packet, &fdata[offset], size);
-				packet[24] = (unsigned char)"\0";
-				//int crcValue = crc32((const char*)packet, size);
-				//memcpy(packet + size, &crcValue, 4);
-				//packet here contains part of the vector and its crc value and how big it is
 
-				/*memset(packet, 0, sizeof(packet));
-				sprintf(message, "%s %d", hello, i);*/
+				// the remaing size of fdata is greater than the PacketSize (>256)
+				if (fdata.size() >= sizeof(packet))
+				{
+					memset(packet, 0, sizeof(packet));
+					memcpy(packet, &fdata[offset], sizeof(packet));
+					/*packet[24] = (unsigned char)"\0";*/
+					//int crcValue = crc32((const char*)packet, size);
+					//memcpy(packet + size, &crcValue, 4);
+					//packet here contains part of the vector and its crc value and how big it is
+
+					/*memset(packet, 0, sizeof(packet));
+					sprintf(message, "%s %d", hello, i);*/
 
 
-				//strcpy((char*)packet, message);
-				connection.SendPacket(packet, sizeof(packet));
+					//strcpy((char*)packet, message);
+					connection.SendPacket(packet, sizeof(packet));
+				}
+
+				// the remaining data in fsize is less than PacketSize (<256)
+				else
+				{
+					memset(packet, 0, fdata.size());
+					memcpy(packet, &fdata[offset], fdata.size());
+					/*packet[24] = (unsigned char)"\0";*/
+					//int crcValue = crc32((const char*)packet, size);
+					//memcpy(packet + size, &crcValue, 4);
+					//packet here contains part of the vector and its crc value and how big it is
+
+					/*memset(packet, 0, sizeof(packet));
+					sprintf(message, "%s %d", hello, i);*/
+
+
+					//strcpy((char*)packet, message);
+					connection.SendPacket(packet, fdata.size());
+				}
+
+				//memset(packet, 0, sizeof(packet));
+				//memcpy(packet, &fdata[offset], sizeof(packet));
+				///*packet[24] = (unsigned char)"\0";*/
+				////int crcValue = crc32((const char*)packet, size);
+				////memcpy(packet + size, &crcValue, 4);
+				////packet here contains part of the vector and its crc value and how big it is
+
+				///*memset(packet, 0, sizeof(packet));
+				//sprintf(message, "%s %d", hello, i);*/
+
+
+				////strcpy((char*)packet, message);
+				//connection.SendPacket(packet, sizeof(packet));
 				/*
 				make sure to break the file into pieces before sending and make sure it has a proper header
 				and also ensure that all the individual pieces are given sequence numbers so they can be properly
@@ -297,7 +339,25 @@ int main(int argc, char* argv[])
 				also making sure metadata gets sent over with the packet properly
 				*/
 				sendAccumulator -= 1.0f / sendRate;
-				offset += size;
+				
+				// increase offset by packet sent
+				//offset += sizeof(packet);
+				
+				printf("size of fdata %d\n", fdata.size());
+
+				// remove packet we just sent from fdata
+				if (fdata.size() >= sizeof(packet))
+				{
+					fdata.erase(fdata.begin(), fdata.begin() + sizeof(packet));
+					printf("erased size of fdata %d\n", fdata.size());
+				}
+				else
+				{
+					printf("in the else statement %d\n", fdata.size());
+					//int difference = sizeof(packet) - fdata.size();
+					fdata.erase(fdata.begin(), fdata.begin() + fdata.size());
+				}
+				
 				printf("Packet Sent: %s\n", packet);
 
 			}
@@ -323,9 +383,11 @@ int main(int argc, char* argv[])
 					break;
 				printf("Packet Recieved: %s\n", packet);
 
-				ofstream file("recieved_file.bin", ofstream::binary);
+				ofstream file;
+				file.open("recieved_file.bin", std::ios_base::binary | std::ios::app);
 				if (file.is_open())
 				{
+					
 					//trying to find the first appearance of a \0 in the packet
 					/*unsigned char remove[sizeof(packet)];
 					for (int i = 0; i < sizeof(packet); i++)
@@ -335,7 +397,9 @@ int main(int argc, char* argv[])
 					int first_null = -1;
 					for (int i = 0; i < sizeof(packet)));*/
 
-					file << packet;
+					file.write((const char*)packet, bytes_read);
+
+					/*file << packet;*/
 					file.close();
 				}
 				else
