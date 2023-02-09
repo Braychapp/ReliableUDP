@@ -2,8 +2,9 @@
 C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(191,21): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
 C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(911,29): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
 C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(912,30): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\ReliableUDP.cpp(242,7): warning C4101: 'message': unreferenced local variable
   Generating code
-  0 of 411 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  2 of 420 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

@@ -1,1 +1,5 @@
-﻿LINK : fatal error LNK1168: cannot open C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\x64\Debug\ReliableUDP.exe for writing
+﻿  ReliableUDP.cpp
+C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(191,21): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
+C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(911,29): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(912,30): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+  ReliableUDP.vcxproj -> C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\x64\Debug\ReliableUDP.exe

@@ -150,7 +150,6 @@ int main(int argc, char* argv[])
 		Server
 	};
 
-	ifstream file;
 	Mode mode = Server;
 	Address address;
 	vector <char> fdata;
@@ -167,19 +166,31 @@ int main(int argc, char* argv[])
 			if (strstr(argv[2], ".txt") != nullptr)
 			{
 				//we know its a text file
-				file.get(argv[2], ios::in);
+				ifstream file(argv[2], ios::in);
 				if (!file.is_open())
 				{
 					cerr << "Failed to open a ASCII file";
+					return 0;
+				}
+				else
+				{
+					fdata.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+					file.close();
 				}
 			}
 			else if (strstr(argv[2], ".bin") != nullptr)
 			{
 				//we know its a binary file
-				file.get(argv[2], ios::binary);
+				ifstream file(argv[2], ios::binary);
 				if (!file.is_open())
 				{
 					cerr << "Failed to open binary file";
+					return 0;
+				}
+				else
+				{
+					fdata.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+					file.close();
 				}
 			}
 			else
@@ -192,8 +203,6 @@ int main(int argc, char* argv[])
 			}
 			//fill the vector
 
-			fdata.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
-			file.close();
 			//here all the file's data is inside fdata
 
 		}
@@ -231,7 +240,8 @@ int main(int argc, char* argv[])
 	int i = 0;
 	char hello[] = "Hello World";
 	char message[15];
-
+					
+	int offset = 0;
 	while (true)
 	{
 		// update flow control
@@ -264,62 +274,78 @@ int main(int argc, char* argv[])
 
 		// send and receive packets
 
-		sendAccumulator += DeltaTime;
-		
-		int offset = 0;
-		while (sendAccumulator > 1.0f / sendRate)
+		if (mode == Client)
 		{
-			//packetsize is 256
-			int size = sizeof(fdata);
-			unsigned char packet[PacketSize];
-			memcpy(packet, &fdata[offset], size - offset);
-			int crcValue = crc32((const char*)packet, size);
-			memcpy(packet + size, &crcValue, 4);
-			//packet here contains part of the vector and its crc value and how big it is
-
-			/*memset(packet, 0, sizeof(packet));
-			sprintf(message, "%s %d", hello, i);*/
-
-
-			//strcpy((char*)packet, message);
-			connection.SendPacket(packet, sizeof(packet));
-			/*
-			make sure to break the file into pieces before sending and make sure it has a proper header
-			and also ensure that all the individual pieces are given sequence numbers so they can be properly
-			reassembled on the other side
-
-			also making sure metadata gets sent over with the packet properly
-			*/
-			sendAccumulator -= 1.0f / sendRate;
-			offset += size;
-			printf("Packet Sent: %s\n", message);
+			sendAccumulator += DeltaTime;
 			
+			while (sendAccumulator > 1.0f / sendRate)
+			{				
+				int size = sizeof(fdata);
+
+				if (offset >= size)
+				{
+					break;
+				}
+				//packetsize is 256
+
+
+				unsigned char packet[PacketSize];
+				memcpy(packet, &fdata[offset], size);
+				int crcValue = crc32((const char*)packet, size);
+				memcpy(packet + size, &crcValue, 4);
+				//packet here contains part of the vector and its crc value and how big it is
+
+				/*memset(packet, 0, sizeof(packet));
+				sprintf(message, "%s %d", hello, i);*/
+
+
+				//strcpy((char*)packet, message);
+				connection.SendPacket(packet, sizeof(packet));
+				/*
+				make sure to break the file into pieces before sending and make sure it has a proper header
+				and also ensure that all the individual pieces are given sequence numbers so they can be properly
+				reassembled on the other side
+
+				also making sure metadata gets sent over with the packet properly
+				*/
+				sendAccumulator -= 1.0f / sendRate;
+				offset += size;
+				printf("Packet Sent: %s\n", packet);
+
+			}
 		}
 
-		while (true)
+		if (mode == Server)
 		{
-			unsigned char packet[256];
-			int bytes_read = connection.ReceivePacket(packet, sizeof(packet));
-			/*
-			Make sure the packets sent in all come with a sequence number and arrange them back into their
-			proper orders
+			while (true)
+			{
+				unsigned char packet[256];
+				int bytes_read = connection.ReceivePacket(packet, sizeof(packet));
+				/*
+				Make sure the packets sent in all come with a sequence number and arrange them back into their
+				proper orders
 
-			Check that the packets have metadata included with them in the transfer
+				Check that the packets have metadata included with them in the transfer
 
-			Verify the integrity of the file that has been sent over and identify if there are any missing 
-			sequence numbers to try and get those sent over once everything else has been sent so that it could be
-			properly reassembled
-			*/
-			if (bytes_read == 0)
-				break;
-			printf("Packet Recieved: %s\n", packet);
+				Verify the integrity of the file that has been sent over and identify if there are any missing
+				sequence numbers to try and get those sent over once everything else has been sent so that it could be
+				properly reassembled
+				*/
+				if (bytes_read == 0)
+					break;
+				printf("Packet Recieved: %s\n", packet);
 
-			/*
-			Once the packets have all been sent and verified we need to make sure they get put back together
-			in the correct order
-			*/
+				ofstream file("recieved_file.bin");
+				file.open("recieved_file.bin", ios::binary);
+				file << packet;
+				file.close();
+
+				/*
+				Once the packets have all been sent and verified we need to make sure they get put back together
+				in the correct order
+				*/
+			}
 		}
-
 		// show packets that were acked this frame
 
 #ifdef SHOW_ACKS
