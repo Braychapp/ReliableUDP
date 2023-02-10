@@ -1,17 +1,19 @@
 ﻿  ReliableUDP.cpp
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\Net.h(191,21): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\Net.h(911,29): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\Net.h(912,30): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(89,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(163,9): warning C4101: 'k': unreferenced local variable
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(369,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(426,52): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(450,48): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(463,12): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(463,12): message : consider using '%zd' in the format string
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(469,13): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(469,13): message : consider using '%zd' in the format string
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(473,13): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(473,13): message : consider using '%zd' in the format string
-C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(366,7): warning C4101: 'message': unreferenced local variable
-  ReliableUDP.vcxproj -> C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\x64\Debug\ReliableUDP.exe
+  The contents of <filesystem> are available only with C++17 or later.
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\Net.h(191,21): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\Net.h(911,29): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\Net.h(912,30): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(90,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(164,9): warning C4101: 'k': unreferenced local variable
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(373,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(430,52): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(454,48): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(467,12): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(467,12): message : consider using '%zd' in the format string
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(473,13): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(473,13): message : consider using '%zd' in the format string
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(477,13): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(477,13): message : consider using '%zd' in the format string
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(569,13): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'std::vector<char,std::allocator<char>>'
+C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\ReliableUDP.cpp(370,7): warning C4101: 'message': unreferenced local variable
+  ReliableUDP.vcxproj -> C:\Users\phren\Desktop\ReliableUDP-Working-binary-file-MD5\ReliableUDP\x64\Debug\ReliableUDP.exe

@@ -19,6 +19,7 @@ close file
 #include <fstream>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 #include "VerifyFiles.h"
 #include "Net.h"
@@ -40,6 +41,10 @@ const float TimeOut = 10.0f;
 const int PacketSize = 256;
 
 // added functions for MD5 hashing taken from https://www.programmingalgorithms.com/algorithm/md5/cpp/
+// sorry I had to add it to the cpp file and not a header file
+// when I tried to add it to a header file, it broke the rest
+// of the code in Net.h
+
 typedef union uwb {
 	unsigned w;
 	unsigned char b[4];
@@ -271,6 +276,9 @@ private:
 
 int main(int argc, char* argv[])
 {
+	// deletes the buffer file that holds the data
+	remove("buffer_file.bin");
+	
 	enum Mode
 	{
 		Client,
@@ -364,7 +372,7 @@ int main(int argc, char* argv[])
 	int i = 0;
 	char hello[] = "Hello World";
 	char message[15];
-					
+		
 	int offset = 0;
 	int size = fdata.size();
 
@@ -427,10 +435,6 @@ int main(int argc, char* argv[])
 					return 1;
 
 				}
-				//packetsize is 256
-
-
-				
 
 				// the remaing size of fdata is greater than the PacketSize (>256)
 				if (fdata.size() > sizeof(packet))
@@ -450,28 +454,20 @@ int main(int argc, char* argv[])
 					connection.SendPacket(packet, fdata.size());
 				}
 
-				/*
-				make sure to break the file into pieces before sending and make sure it has a proper header
-				and also ensure that all the individual pieces are given sequence numbers so they can be properly
-				reassembled on the other side
-
-				also making sure metadata gets sent over with the packet properly
-				*/
 				sendAccumulator -= 1.0f / sendRate;
 				
-				
-				printf("size of fdata %d\n", fdata.size());
 
 				// remove packet we just sent from fdata
 				if (fdata.size() >= sizeof(packet))
 				{
+					// removes the last remaining amount of fdata, that is less
+					// than or equal to the packet amount (<256)
 					fdata.erase(fdata.begin(), fdata.begin() + sizeof(packet));
-					printf("erased size of fdata %d\n", fdata.size());
 				}
 				else
 				{
-					printf("in the else statement %d\n", fdata.size());
-					//int difference = sizeof(packet) - fdata.size();
+					// usually happens for most of the file transfer, except the last transfer of packets
+					// removes the packet that was just sent from fdata
 					fdata.erase(fdata.begin(), fdata.begin() + fdata.size());
 				}
 				
@@ -482,36 +478,27 @@ int main(int argc, char* argv[])
 
 		if (mode == Server)
 		{
-			//// deletes the buffer file that holds the data
-			//remove("buffer_file.bin");
+
+			char hashCodeFromClient[33] = {NULL};
+			
 
 			while (true)
 			{
 				unsigned char packet[256];
 				int bytes_read = connection.ReceivePacket(packet, sizeof(packet));
-				/*
-				Make sure the packets sent in all come with a sequence number and arrange them back into their
-				proper orders
 
-				Check that the packets have metadata included with them in the transfer
-
-				Verify the integrity of the file that has been sent over and identify if there are any missing
-				sequence numbers to try and get those sent over once everything else has been sent so that it could be
-				properly reassembled
-				*/
 				if (bytes_read == 0)
 					break;
+
 				printf("Packet Recieved: %s\n", packet);
 
-				ofstream file;
 
+				// Open the buffer_file that the packets will be written to
+				ofstream file;
 				file.open("buffer_file.bin", std::ios_base::binary | std::ios::app);
 				if (file.is_open())
 				{
-
 					file.write((const char*)packet, bytes_read);
-
-					/*file << packet;*/
 					file.close();
 				}
 				else
@@ -519,11 +506,34 @@ int main(int argc, char* argv[])
 					cerr << "error opening binary file";
 				}
 
-				/*
-				Once the packets have all been sent and verified we need to make sure they get put back together
-				in the correct order
-				*/
+
+				// now open the buffer file after it has been written to
+				// and extract the hash code from the last 32 bytes
+				
+				ifstream inputFile;
+				
+				inputFile.open("buffer_file.bin", ios::binary | ios::ate);
+				if (inputFile.is_open())
+				{
+					inputFile.seekg(-32, std::ios::end);
+					inputFile.read(hashCodeFromClient, 32);
+					hashCodeFromClient[32] = 0;
+
+					inputFile.close();
+					printf("HERE IS THE SERVER HASH CODE: %s\n\n", hashCodeFromClient);
+				}
+
 			}
+
+			// we have the hash code after the file has been fully transfered
+			// problem is that it breaks above while loop, for small moments between
+			// sending packets
+			if (hashCodeFromClient != NULL)
+			{
+				
+
+			}
+			
 		}
 		// show packets that were acked this frame
 
