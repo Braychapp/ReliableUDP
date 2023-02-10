@@ -1,5 +1,17 @@
 ﻿  ReliableUDP.cpp
-C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(191,21): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
-C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(911,29): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
-C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\Net.h(912,30): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
-  ReliableUDP.vcxproj -> C:\Users\brayc\OneDrive\Desktop\SET SEMESTER 4\Network Application Development\ReliableUDP\x64\Debug\ReliableUDP.exe
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\Net.h(191,21): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\Net.h(911,29): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\Net.h(912,30): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(89,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(163,9): warning C4101: 'k': unreferenced local variable
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(369,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(426,52): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(450,48): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(463,12): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(463,12): message : consider using '%zd' in the format string
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(469,13): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(469,13): message : consider using '%zd' in the format string
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(473,13): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(473,13): message : consider using '%zd' in the format string
+C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\ReliableUDP.cpp(366,7): warning C4101: 'message': unreferenced local variable
+  ReliableUDP.vcxproj -> C:\Users\phren\Downloads\ReliableUDP-Working-binary-file-transfer\x64\Debug\ReliableUDP.exe

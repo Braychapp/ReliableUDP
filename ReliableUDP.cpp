@@ -39,6 +39,144 @@ const float SendRate = 1.0f / 30.0f;
 const float TimeOut = 10.0f;
 const int PacketSize = 256;
 
+// added functions for MD5 hashing taken from https://www.programmingalgorithms.com/algorithm/md5/cpp/
+typedef union uwb {
+	unsigned w;
+	unsigned char b[4];
+} MD5union;
+
+typedef unsigned DigestArray[4];
+
+static unsigned func0(unsigned abcd[]) {
+	return (abcd[1] & abcd[2]) | (~abcd[1] & abcd[3]);
+}
+
+static unsigned func1(unsigned abcd[]) {
+	return (abcd[3] & abcd[1]) | (~abcd[3] & abcd[2]);
+}
+
+static unsigned func2(unsigned abcd[]) {
+	return  abcd[1] ^ abcd[2] ^ abcd[3];
+}
+
+static unsigned func3(unsigned abcd[]) {
+	return abcd[2] ^ (abcd[1] | ~abcd[3]);
+}
+
+typedef unsigned(*DgstFctn)(unsigned a[]);
+
+static unsigned* calctable(unsigned* k)
+{
+	double s, pwr;
+	int i;
+
+	pwr = pow(2.0, 32);
+	for (i = 0; i < 64; i++) {
+		s = fabs(sin(1.0 + i));
+		k[i] = (unsigned)(s * pwr);
+	}
+	return k;
+}
+
+static unsigned rol(unsigned r, short N)
+{
+	unsigned  mask1 = (1 << N) - 1;
+	return ((r >> (32 - N)) & mask1) | ((r << N) & ~mask1);
+}
+
+static unsigned* MD5Hash(string msg)
+{
+	int mlen = msg.length();
+	static DigestArray h0 = { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476 };
+	static DgstFctn ff[] = { &func0, &func1, &func2, &func3 };
+	static short M[] = { 1, 5, 3, 7 };
+	static short O[] = { 0, 1, 5, 0 };
+	static short rot0[] = { 7, 12, 17, 22 };
+	static short rot1[] = { 5, 9, 14, 20 };
+	static short rot2[] = { 4, 11, 16, 23 };
+	static short rot3[] = { 6, 10, 15, 21 };
+	static short* rots[] = { rot0, rot1, rot2, rot3 };
+	static unsigned kspace[64];
+	static unsigned* k;
+
+	static DigestArray h;
+	DigestArray abcd;
+	DgstFctn fctn;
+	short m, o, g;
+	unsigned f;
+	short* rotn;
+	union {
+		unsigned w[16];
+		char     b[64];
+	}mm;
+	int os = 0;
+	int grp, grps, q, p;
+	unsigned char* msg2;
+
+	if (k == NULL) k = calctable(kspace);
+
+	for (q = 0; q < 4; q++) h[q] = h0[q];
+
+	{
+		grps = 1 + (mlen + 8) / 64;
+		msg2 = (unsigned char*)malloc(64 * grps);
+		memcpy(msg2, msg.c_str(), mlen);
+		msg2[mlen] = (unsigned char)0x80;
+		q = mlen + 1;
+		while (q < 64 * grps) { msg2[q] = 0; q++; }
+		{
+			MD5union u;
+			u.w = 8 * mlen;
+			q -= 8;
+			memcpy(msg2 + q, &u.w, 4);
+		}
+	}
+
+	for (grp = 0; grp < grps; grp++)
+	{
+		memcpy(mm.b, msg2 + os, 64);
+		for (q = 0; q < 4; q++) abcd[q] = h[q];
+		for (p = 0; p < 4; p++) {
+			fctn = ff[p];
+			rotn = rots[p];
+			m = M[p]; o = O[p];
+			for (q = 0; q < 16; q++) {
+				g = (m * q + o) % 16;
+				f = abcd[1] + rol(abcd[0] + fctn(abcd) + k[q + 16 * p] + mm.w[g], rotn[q % 4]);
+
+				abcd[0] = abcd[3];
+				abcd[3] = abcd[2];
+				abcd[2] = abcd[1];
+				abcd[1] = f;
+			}
+		}
+		for (p = 0; p < 4; p++)
+			h[p] += abcd[p];
+		os += 64;
+	}
+
+	return h;
+}
+
+static string GetMD5String(string msg) {
+	string str;
+	int j, k;
+	unsigned* d = MD5Hash(msg);
+	MD5union u;
+	for (j = 0; j < 4; j++) {
+		u.w = d[j];
+		char s[9];
+		sprintf(s, "%02x%02x%02x%02x", u.b[0], u.b[1], u.b[2], u.b[3]);
+		str += s;
+	}
+
+	return str;
+}
+
+//
+// END OF MD5 Hashing stuff
+//
+
 class FlowControl
 {
 public:
@@ -228,7 +366,9 @@ int main(int argc, char* argv[])
 	char message[15];
 					
 	int offset = 0;
-	int size = sizeof(fdata);
+	int size = fdata.size();
+
+	
 	while (true)
 	{
 		// update flow control
@@ -263,32 +403,53 @@ int main(int argc, char* argv[])
 
 		if (mode == Client)
 		{
+
+			// Get the vector data into a string
+			string md5Buffer;
+			for (char c : fdata)
+			{
+				md5Buffer.push_back(c);
+			}
+			md5Buffer = GetMD5String(md5Buffer); // Get the MD5 String value
+
+
 			sendAccumulator += DeltaTime;
 			
 			while (sendAccumulator > 1.0f / sendRate)
-			{				
-				
+			{			
+				unsigned char packet[PacketSize];
 
-				/*if (offset >= size)
+				if (fdata.size() <= 0)
 				{
-					break;
-				}*/
+					// send the last 32 bit hashing
+					memcpy(packet, &md5Buffer[offset], md5Buffer.size());
+					connection.SendPacket(packet, md5Buffer.size());
+					return 1;
+
+				}
 				//packetsize is 256
 
 
-				unsigned char packet[PacketSize];
-				memcpy(packet, &fdata[offset], size);
-				packet[24] = (unsigned char)"\0";
-				//int crcValue = crc32((const char*)packet, size);
-				//memcpy(packet + size, &crcValue, 4);
-				//packet here contains part of the vector and its crc value and how big it is
+				
 
-				/*memset(packet, 0, sizeof(packet));
-				sprintf(message, "%s %d", hello, i);*/
+				// the remaing size of fdata is greater than the PacketSize (>256)
+				if (fdata.size() > sizeof(packet))
+				{
+					memset(packet, 0, sizeof(packet));
+					memcpy(packet, &fdata[offset], sizeof(packet));
 
+					connection.SendPacket(packet, sizeof(packet));
+				}
 
-				//strcpy((char*)packet, message);
-				connection.SendPacket(packet, sizeof(packet));
+				// the remaining data in fsize is less than PacketSize (<256), last send of file data, not including hash number
+				else if (fdata.size() <= sizeof(packet))
+				{
+					memset(packet, 0, fdata.size());
+					memcpy(packet, &fdata[offset], fdata.size());
+
+					connection.SendPacket(packet, fdata.size());
+				}
+
 				/*
 				make sure to break the file into pieces before sending and make sure it has a proper header
 				and also ensure that all the individual pieces are given sequence numbers so they can be properly
@@ -297,7 +458,23 @@ int main(int argc, char* argv[])
 				also making sure metadata gets sent over with the packet properly
 				*/
 				sendAccumulator -= 1.0f / sendRate;
-				offset += size;
+				
+				
+				printf("size of fdata %d\n", fdata.size());
+
+				// remove packet we just sent from fdata
+				if (fdata.size() >= sizeof(packet))
+				{
+					fdata.erase(fdata.begin(), fdata.begin() + sizeof(packet));
+					printf("erased size of fdata %d\n", fdata.size());
+				}
+				else
+				{
+					printf("in the else statement %d\n", fdata.size());
+					//int difference = sizeof(packet) - fdata.size();
+					fdata.erase(fdata.begin(), fdata.begin() + fdata.size());
+				}
+				
 				printf("Packet Sent: %s\n", packet);
 
 			}
@@ -305,6 +482,9 @@ int main(int argc, char* argv[])
 
 		if (mode == Server)
 		{
+			//// deletes the buffer file that holds the data
+			//remove("buffer_file.bin");
+
 			while (true)
 			{
 				unsigned char packet[256];
@@ -323,19 +503,15 @@ int main(int argc, char* argv[])
 					break;
 				printf("Packet Recieved: %s\n", packet);
 
-				ofstream file("recieved_file.bin", ofstream::binary);
+				ofstream file;
+
+				file.open("buffer_file.bin", std::ios_base::binary | std::ios::app);
 				if (file.is_open())
 				{
-					//trying to find the first appearance of a \0 in the packet
-					/*unsigned char remove[sizeof(packet)];
-					for (int i = 0; i < sizeof(packet); i++)
-					{
-						remove[i];
-					}
-					int first_null = -1;
-					for (int i = 0; i < sizeof(packet)));*/
 
-					file << packet;
+					file.write((const char*)packet, bytes_read);
+
+					/*file << packet;*/
 					file.close();
 				}
 				else
