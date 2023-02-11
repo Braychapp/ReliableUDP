@@ -1,0 +1,29 @@
+[33mcommit 5b2e408e48319c6a5ef4cc3bdf6da98e8639c6cb[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Braychapp <bchapple8815@conestogac.on.ca>
+Date:   Tue Jan 31 20:20:53 2023 -0500
+
+    added new files for the assignment
+
+[33mcommit 548c61ba11715d32be17033fe128e2a99aaa2b7c[m
+Author: Braychapp <bchapple8815@conestogac.on.ca>
+Date:   Tue Jan 17 21:04:28 2023 -0500
+
+    finished the code
+
+[33mcommit 708611bd22ca79989284d2e32aedcbfc4974ba8e[m
+Author: Braychapp <bchapple8815@conestogac.on.ca>
+Date:   Mon Jan 16 20:13:18 2023 -0500
+
+    Fixed server startup bug
+
+[33mcommit ed65dba71661dcbac9ab09f77b4b082bfb99ff61[m
+Author: Braychapp <bchapple8815@conestogac.on.ca>
+Date:   Mon Jan 16 20:09:45 2023 -0500
+
+    Made the code compile
+
+[33mcommit d7f2ce6610991c6bb80a113c6570b9663a3219f1[m
+Author: Braychapp <bchapple8815@conestogac.on.ca>
+Date:   Mon Jan 16 19:24:06 2023 -0500
+
+    Initial Commit
