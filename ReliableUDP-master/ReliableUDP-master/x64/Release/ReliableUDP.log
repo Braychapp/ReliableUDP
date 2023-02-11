@@ -1,0 +1,16 @@
+﻿  ReliableUDP.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\filesystem(13): warning STL4038: The contents of <filesystem> are available only with C++17 or later.
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\Net.h(191,21): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\Net.h(911,29): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\Net.h(912,30): warning C4244: '/=': conversion from 'float' to 'int', possible loss of data
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\ReliableUDP.cpp(100,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\ReliableUDP.cpp(174,9): warning C4101: 'k': unreferenced local variable
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\ReliableUDP.cpp(395,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\ReliableUDP.cpp(458,52): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\ReliableUDP.cpp(481,48): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\ReliableUDP.cpp(392,7): warning C4101: 'message': unreferenced local variable
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 527 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  ReliableUDP.vcxproj -> C:\Users\brayc\Downloads\ReliableUDP-master\ReliableUDP-master\x64\Release\ReliableUDP.exe
