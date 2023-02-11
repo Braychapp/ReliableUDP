@@ -1,4 +1,15 @@
 /*
+* FILE : ReliableUDP.cpp
+* PROJECT : Reliable UDP
+* PROGRAMMER : Brayden Chapple, Evan O'Hara
+* FIRST VERSION : 2023-02-10
+* DESCRIPTION :
+* This program is used to open a server and a client then send files between them using UDP
+*/
+
+
+
+/*
 	Reliability and Flow Control Example
 	From "Networking for Game Programmers" - http://www.gaffer.org/networking-for-game-programmers
 	Author: Glenn Fiedler <gaffer@gaffer.org>
@@ -20,8 +31,8 @@ close file
 #include <string>
 #include <vector>
 #include <filesystem>
+#include<chrono>
 
-#include "VerifyFiles.h"
 #include "Net.h"
 #pragma warning(disable : 4996)
 
@@ -39,6 +50,11 @@ const float DeltaTime = 1.0f / 30.0f;
 const float SendRate = 1.0f / 30.0f;
 const float TimeOut = 10.0f;
 const int PacketSize = 256;
+int packetsRecieved = 0;
+char filenameO[50];
+
+
+
 
 // added functions for MD5 hashing taken from https://www.programmingalgorithms.com/algorithm/md5/cpp/
 // sorry I had to add it to the cpp file and not a header file
@@ -277,7 +293,7 @@ private:
 int main(int argc, char* argv[])
 {
 	// deletes the buffer file that holds the data
-	remove("buffer_file.bin");
+	//remove("buffer_file.bin");
 	
 	enum Mode
 	{
@@ -288,7 +304,7 @@ int main(int argc, char* argv[])
 	Mode mode = Server;
 	Address address;
 	vector <char> fdata;
-
+	vector <char> filename;
 	if (argc >= 2)
 	{
 		int a, b, c, d;
@@ -301,7 +317,7 @@ int main(int argc, char* argv[])
 			if (strstr(argv[2], ".txt") != nullptr)
 			{
 				//we know its a text file
-				ifstream file(argv[2], ios::in);
+				ifstream file(argv[2]);
 				if (!file.is_open())
 				{
 					cerr << "Failed to open a ASCII file";
@@ -311,29 +327,39 @@ int main(int argc, char* argv[])
 				{
 					fdata.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
 					file.close();
+
+					string str = argv[2];
+					str = str + " ";
+					filename.assign(str.begin(), str.end());
+					fdata.insert(fdata.begin(), 1);
+					fdata.insert(fdata.begin() + 1, filename.begin(), filename.end());
 				}
 			}
 			else if (strstr(argv[2], ".bin") != nullptr)
 			{
 				//we know its a binary file
-				ifstream file(argv[2], ios::binary);
+				ifstream file(argv[2]);
 				if (!file.is_open())
 				{
 					cerr << "Failed to open binary file";
-					return 0;
 				}
 				else
 				{
 					fdata.assign((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
 					file.close();
+
+					string str = argv[2];
+					str = str + " ";
+					filename.assign(str.begin(), str.end());
+					fdata.insert(fdata.begin(), 1);
+					fdata.insert(fdata.begin() + 1, filename.begin(), filename.end());
+
 				}
 			}
 			else
 			{
 				//no file found
 				cerr << "No accepted file extension specified";
-
-
 				return 0;
 			}
 
@@ -393,6 +419,10 @@ int main(int argc, char* argv[])
 			flowControl.Reset();
 			printf("reset flow control\n");
 			connected = false;
+			packetsRecieved = 0;
+			for (int i = 0; i < 50; i++) {
+				filenameO[i] = '\0';
+			}
 		}
 
 		if (!connected && connection.IsConnected())
@@ -423,6 +453,8 @@ int main(int argc, char* argv[])
 
 			sendAccumulator += DeltaTime;
 			
+			auto start = chrono::steady_clock::now();
+
 			while (sendAccumulator > 1.0f / sendRate)
 			{			
 				unsigned char packet[PacketSize];
@@ -432,6 +464,9 @@ int main(int argc, char* argv[])
 					// send the last 32 bit hashing
 					memcpy(packet, &md5Buffer[offset], md5Buffer.size());
 					connection.SendPacket(packet, md5Buffer.size());
+					auto end = chrono::steady_clock::now();
+					chrono::duration<double> elapsed_seconds = end - start;
+					cout << "elapsed file transfer time: " << elapsed_seconds.count() << "s or: " << elapsed_seconds.count() * 1000 << "ms\n";
 					return 1;
 
 				}
@@ -480,22 +515,75 @@ int main(int argc, char* argv[])
 		{
 
 			char hashCodeFromClient[33] = {NULL};
-			
 
 			while (true)
 			{
 				unsigned char packet[256];
+				vector<char> filenameVec;
 				int bytes_read = connection.ReceivePacket(packet, sizeof(packet));
 
 				if (bytes_read == 0)
+				{
+					
 					break;
+				}
+
+				//this is used for getting the filename and extension
+				if (packetsRecieved == 0)
+				{
+					packet[0] = '1';
+					packetsRecieved++;
+				}
 
 				printf("Packet Recieved: %s\n", packet);
+				//below deals with the first packet that is recieved because it contains the filename and extension
+				if (packetsRecieved == 1)
+				{
+					int length = sizeof(packet) / sizeof(packet[0]);
+					int space_index = -1;
+					vector<char> data;
+
+					for (int i = 0; i < length; i++) {
+						if (packet[i] == ' ') {
+							space_index = i;
+							break;
+						}
+						if (space_index == -1)
+						{
+							filenameVec.push_back(packet[i]);
+						}
+						else
+						{
+							break;
+						}
+						
+					}
+
+					for (int i = 0; i < filenameVec.size(); i++) {
+						filenameO[i - 1] = filenameVec[i];
+					}
+					if (space_index != -1) {
+						for (int i = space_index + 1; i < length; i++) {
+							data.push_back(packet[i]);
+						}
+						//putting the data back into the packet after removing what was necessary
+						for (int i = 0; i < data.size(); i++)
+						{
+							packet[i] = data[i];
+							if (data[i] == '\0')
+								break;
+						}
+					}
+					packetsRecieved++;
+					
+				}
 
 
 				// Open the buffer_file that the packets will be written to
+				
+				const char* fileN = filenameO;
 				ofstream file;
-				file.open("buffer_file.bin", std::ios_base::binary | std::ios::app);
+				file.open(fileN, std::ios_base::binary | std::ios::app);
 				if (file.is_open())
 				{
 					file.write((const char*)packet, bytes_read);
@@ -503,16 +591,17 @@ int main(int argc, char* argv[])
 				}
 				else
 				{
-					cerr << "error opening binary file";
+					cerr << "error opening file for writing.";
+					return 0;
 				}
 
 
 				// now open the buffer file after it has been written to
 				// and extract the hash code from the last 32 bytes
 				
-				ifstream inputFile;
+				/*ifstream inputFile;
 				
-				inputFile.open("buffer_file.bin", ios::binary | ios::ate);
+				inputFile.open(fileN, ios::binary | ios::ate);
 				if (inputFile.is_open())
 				{
 					inputFile.seekg(-32, std::ios::end);
@@ -521,18 +610,18 @@ int main(int argc, char* argv[])
 
 					inputFile.close();
 					printf("HERE IS THE SERVER HASH CODE: %s\n\n", hashCodeFromClient);
-				}
+				}*/
 
 			}
 
-			// we have the hash code after the file has been fully transfered
-			// problem is that it breaks above while loop, for small moments between
-			// sending packets
-			if (hashCodeFromClient != NULL)
-			{
-				
+			//// we have the hash code after the file has been fully transfered
+			//// problem is that it breaks above while loop, for small moments between
+			//// sending packets
+			//if (hashCodeFromClient != NULL)
+			//{
+			//	
 
-			}
+			//}
 			
 		}
 		// show packets that were acked this frame

@@ -1,4 +1,12 @@
 /*
+* FILE : Net.h
+* PROJECT : Reliable UDP
+* PROGRAMMER : Brayden Chapple, Evan O'Hara
+* FIRST VERSION : 2023-02-10
+* DESCRIPTION :
+* The functions in this file are used for the behind the scenes of the server and client to make it run smoothly
+*/
+/*
 	Simple Network Library from "Networking for Game Programmers"
 	http://www.gaffer.org/networking-for-game-programmers
 	Author: Glenn Fiedler <gaffer@gaffer.org>

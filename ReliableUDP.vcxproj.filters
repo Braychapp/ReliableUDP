@@ -23,14 +23,5 @@
     <ClInclude Include="Net.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LoadAndSaveFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SendAndRecieve.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VerifyFiles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
